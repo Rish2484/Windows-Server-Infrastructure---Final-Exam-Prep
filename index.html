@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script>try{if(localStorage.getItem('wsis-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Windows Server Infrastructure Services — Final Exam Prep Quiz</title>
@@ -22,6 +23,7 @@
   --artifact-radius: 14px;
 }
 html[data-theme='dark']{
+  color-scheme: dark;
   --artifact-background: var(--theme-background, #0e1116);
   --artifact-surface: var(--theme-background-light, #171b22);
   --artifact-surface-2: var(--theme-background-light, #1e232c);
@@ -155,6 +157,8 @@ footer{color:var(--artifact-muted);font-size:12.5px;text-align:center;margin-top
     <div class="sb-item"><span class="sb-val" id="sbPct">—</span><span class="sb-lab">Score</span></div>
     <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
     <div class="controls">
+      <button class="btn" id="btnTheme" type="button" aria-pressed="false">Dark mode</button>
+      <button class="btn" id="btnReveal" type="button">Reveal answers</button>
       <button class="btn primary" id="btnResults" type="button">See results</button>
       <button class="btn" id="btnReset" type="button">Reset</button>
     </div>
@@ -323,6 +327,28 @@ const _fb=document.getElementById('filterbar'); if(_fb) _fb.addEventListener('cl
   document.getElementById('results').classList.remove('show');
   render(); updateScore(); window.scrollTo({top:0,behavior:'smooth'});
 });
+function revealAll(){
+  QUESTIONS.forEach(q=>{
+    state[q.id]={chosen:answerSet(q).slice(), correct:true};
+    delete picks[q.id];
+  });
+  document.getElementById('results').classList.remove('show');
+  render(); updateScore();
+}
+
+const THEME_KEY = 'wsis-theme';
+const themeBtn = document.getElementById('btnTheme');
+function applyTheme(dark){
+  if(dark) document.documentElement.setAttribute('data-theme','dark');
+  else document.documentElement.removeAttribute('data-theme');
+  themeBtn.textContent = dark ? 'Light mode' : 'Dark mode';
+  themeBtn.setAttribute('aria-pressed', dark ? 'true' : 'false');
+  try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch(e){}
+}
+themeBtn.addEventListener('click',()=> applyTheme(document.documentElement.getAttribute('data-theme')!=='dark'));
+try { if(localStorage.getItem(THEME_KEY)==='dark') applyTheme(true); } catch(e){}
+
+document.getElementById('btnReveal').addEventListener('click',revealAll);
 document.getElementById('btnResults').addEventListener('click',showResults);
 document.getElementById('btnReset').addEventListener('click',()=>{
   currentList().forEach(q=>{ delete state[q.id]; delete picks[q.id]; });
